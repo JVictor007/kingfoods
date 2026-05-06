@@ -1,3 +1,4 @@
+// Sistema de notificação via Toast
 function showToast(message) {
   const toastElement = document.getElementById('liveToast');
   const toastMessage = document.getElementById('toastMessage');
@@ -6,96 +7,80 @@ function showToast(message) {
   toast.show();
 }
 
-// Lógica de cadastro com validação
+// Validação e cadastro de usuário
 document.getElementById('cadastrarBtn').addEventListener('click', function() {
   const email = document.getElementById('floatingEmail').value.trim();
   const senha = document.getElementById('floatingPassword').value.trim();
   const telefone = document.getElementById('floatingPhone').value.trim();
-  const termsAccepted = document.getElementById('termsCheck').checked;
+  const termos = document.getElementById('termsCheck').checked;
   
-  // Validação
+  // Validações
   if (!email || !senha || !telefone) {
-    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-    document.getElementById('errorMessage').innerHTML = '❌ Por favor, preencha todos os campos (Email, Senha e Telefone)!';
-    errorModal.show();
-    return;
-  }
-  
-  if (!termsAccepted) {
-    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-    document.getElementById('errorMessage').innerHTML = '📝 Você precisa concordar com os termos para se cadastrar!';
-    errorModal.show();
+    document.getElementById('errorMessage').innerHTML = 'Todos os campos são obrigatórios.';
+    new bootstrap.Modal(document.getElementById('errorModal')).show();
     return;
   }
   
   if (!email.includes('@') || !email.includes('.')) {
-    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-    document.getElementById('errorMessage').innerHTML = '📧 Digite um email válido (exemplo@dominio.com)!';
-    errorModal.show();
+    document.getElementById('errorMessage').innerHTML = 'Digite um e-mail válido.';
+    new bootstrap.Modal(document.getElementById('errorModal')).show();
     return;
   }
   
   if (senha.length < 4) {
-    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-    document.getElementById('errorMessage').innerHTML = '🔒 A senha deve ter no mínimo 4 caracteres!';
-    errorModal.show();
+    document.getElementById('errorMessage').innerHTML = 'A senha deve ter no mínimo 4 caracteres.';
+    new bootstrap.Modal(document.getElementById('errorModal')).show();
     return;
   }
   
-  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-  successModal.show();
+  if (!termos) {
+    document.getElementById('errorMessage').innerHTML = 'Você deve aceitar os termos de uso.';
+    new bootstrap.Modal(document.getElementById('errorModal')).show();
+    return;
+  }
   
-  // Limpar campos opcionalmente
+  // Cadastro bem-sucedido
+  new bootstrap.Modal(document.getElementById('successModal')).show();
+  
+  // Limpar formulário
   document.getElementById('floatingEmail').value = '';
   document.getElementById('floatingPassword').value = '';
   document.getElementById('floatingPhone').value = '';
   document.getElementById('termsCheck').checked = false;
   
-  // Toast de boas-vindas
-  setTimeout(() => {
-    showToast('🎉 Bem-vindo ao KingFood! Aproveite as ofertas exclusivas.');
-  }, 500);
+  showToast('Cadastro realizado com sucesso!');
 });
 
-// Sistema de pesquisa interativo
+// Sistema de pesquisa
 document.getElementById('searchForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const searchTerm = document.getElementById('searchInput').value.trim();
+  
   if (searchTerm) {
-    showToast(`🔍 Pesquisando por "${searchTerm}" em nossos restaurantes parceiros...`);
-    // Simulação: poderia redirecionar ou filtrar
-    setTimeout(() => {
-      showToast(`✨ Encontramos diversas opções para "${searchTerm}"! Explore nosso site.`);
-    }, 1500);
+    showToast(`Buscando por: ${searchTerm}`);
   } else {
-    showToast('🍽️ Digite o nome de um restaurante ou prato para pesquisar!');
+    showToast('Digite um termo para pesquisar.');
   }
 });
 
-// Feedback flutuante
+// Feedback do usuário
 document.getElementById('feedbackBtn').addEventListener('click', function() {
-  const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
-  feedbackModal.show();
+  new bootstrap.Modal(document.getElementById('feedbackModal')).show();
 });
 
 document.getElementById('sendFeedback').addEventListener('click', function() {
-  const feedbackMsg = document.getElementById('feedbackText').value.trim();
-  if (feedbackMsg) {
-    showToast('💖 Obrigado pelo seu feedback! Vamos melhorar ainda mais o KingFood.');
+  const feedback = document.getElementById('feedbackText').value.trim();
+  
+  if (feedback) {
+    showToast('Feedback enviado com sucesso. Obrigado!');
     document.getElementById('feedbackText').value = '';
-    const modal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
-    modal.hide();
+    bootstrap.Modal.getInstance(document.getElementById('feedbackModal')).hide();
   } else {
-    showToast('📝 Por favor, digite seu feedback antes de enviar.');
+    showToast('Digite sua mensagem antes de enviar.');
   }
 });
 
-// Efeito de animação ao rolar para os cards
-const observerOptions = {
-  threshold: 0.2,
-  rootMargin: "0px 0px -50px 0px"
-};
-
+// Efeito de fade-in nos cards ao rolar a página
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -103,64 +88,25 @@ const observer = new IntersectionObserver((entries) => {
       entry.target.style.transform = 'translateY(0)';
     }
   });
-}, observerOptions);
+}, { threshold: 0.1 });
 
-document.querySelectorAll('.row .col').forEach(card => {
+document.querySelectorAll('#sobre .col').forEach(card => {
   card.style.opacity = '0';
-  card.style.transform = 'translateY(30px)';
-  card.style.transition = 'all 0.6s ease';
+  card.style.transform = 'translateY(20px)';
+  card.style.transition = 'all 0.5s ease';
   observer.observe(card);
 });
 
-// Efeito nas imagens das colunas
-const allImages = document.querySelectorAll('.col img');
-allImages.forEach(img => {
+// Clique nas imagens da galeria
+document.querySelectorAll('.container img').forEach(img => {
   img.addEventListener('click', function() {
-    showToast(`🍽️ Descubra receitas e restaurantes incríveis no KingFood!`);
-  });
-});
-
-// Adicionar tooltips para os links do dropdown
-const dropdownItems = document.querySelectorAll('.dropdown-item');
-dropdownItems.forEach(item => {
-  item.addEventListener('click', function(e) {
-    showToast(`🌍 Redirecionando para ${this.textContent.trim()}... Aproveite!`);
+    showToast('Explore nosso cardápio completo.');
   });
 });
 
 // Mensagem de boas-vindas ao carregar a página
 window.addEventListener('load', function() {
   setTimeout(() => {
-    showToast('👑 Bem-vindo ao KingFood! Descubra os melhores restaurantes do Brasil.');
+    showToast('Bem-vindo ao KingFood');
   }, 1000);
-});
-
-// Efeito de foco no formulário
-const formInputs = document.querySelectorAll('.form-floating textarea');
-formInputs.forEach(input => {
-  input.addEventListener('focus', function() {
-    this.style.borderColor = '#c49a2a';
-    this.style.boxShadow = '0 0 0 3px rgba(196,154,42,0.2)';
-  });
-  input.addEventListener('blur', function() {
-    this.style.borderColor = '#e0e0e0';
-    this.style.boxShadow = 'none';
-  });
-});
-
-// Scroll suave para links internos
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    const href = this.getAttribute('href');
-    if (href !== "#" && href !== "") {
-      e.preventDefault();
-      const target = document.querySelector(href);
-      if (target) {
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }
-  });
 });
